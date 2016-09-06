@@ -1,6 +1,16 @@
 
-<ion-view ng-controller="infoCtrl" view-title="Edit Unsolved Problem" name="editUnsolved">
+<ion-view view-title="Edit Unsolved Problem" name="editUnsolved">
       <ion-content>
-      <h1>Finally the Rock</h1>
+      <div class="table1">
+        <form>
+          <label class="item item-input">
+            <input type="text" ng-model="item.firstname">
+          </label>
+          <label class="item item-input">
+            <input type="text" ng-model="item.lastname">
+          </label>
+          <button class="button button-block button-positive" ng-click="save(item)">Save</button>
+        </form>
+      </div>
       </ion-content>
 </ion-view>

@@ -1,0 +1,24 @@
+<ion-view  name="unsolved" view-title="Unsolved Problem">
+
+ <ion-content>
+<div class="table2">
+        <div class="row">
+          <div class="col col-50">First Name</div>
+          <div class="col col-50">Last Name</div>
+        </div>
+        
+      </div>
+
+      <ion-list show-delete="false" can-swipe="true">
+        <ion-item ng-repeat="item in alldata">
+          <div class="row">
+             <div class="col col-50">{{item.firstname}}</div>
+             <div class="col col-50">{{item.lastname}}</div>
+            <a href="#/edit/{{item.id}}" class="button button-light icon ion-edit"></a>
+          </div>
+          <ion-option-button ng-controller="DeleteCtrl" class="button-assertive icon ion-trash-a" ng-click="showConfirm(item)"> Delete </ion-option-button>
+        </ion-item>
+      </ion-list>
+      <a href="#/add" class="col button button-balanced ion-plus-circled"> Add Unsolved Problem</a>
+    </ion-content>
+</ion-view>

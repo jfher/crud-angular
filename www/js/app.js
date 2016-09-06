@@ -6,7 +6,7 @@
 var db=null;
 var app = angular.module('starter', ['ionic','ngCordova']);
 
-app.run(function($ionicPlatform,$cordovaSQLite) {
+app.run(function($ionicPlatform,$cordovaSQLite,$state) {
   $ionicPlatform.ready(function() {
     if(window.cordova && window.cordova.plugins.Keyboard) {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -27,45 +27,41 @@ app.run(function($ionicPlatform,$cordovaSQLite) {
   });
 })
 
-app.controller('infoCtrl',function($scope,$cordovaSQLite,$ionicPlatform,$ionicPopup){
+
+app.controller('AddCtrl', function($scope, $cordovaSQLite, $state){
+    $scope.item = {
+      firstname: "",
+      lastname: ""
+    };
+
+    $scope.save = function(item){
+      var query ="INSERT INTO example(firstname,lastname) VALUES (?,?)";
+      $cordovaSQLite.execute(db,query,[$scope.item.firstname,$scope.item.lastname]);
+      $state.go('unsolved');
+    };
+});
+
+app.controller('ShowCtrl', function($scope, $cordovaSQLite, $state,$ionicPlatform){
   $scope.alldata=[];
- $scope.addInfo=function(){
-  var query ="INSERT INTO example(firstname,lastname) VALUES (?,?)";
-  $cordovaSQLite.execute(db,query,[$scope.firstname,$scope.lastname]);
- }
 
- $ionicPlatform.ready(function(){
-
-  $cordovaSQLite.execute(db,"SELECT * FROM example").then(function(result){
-    if(result.rows.length){
-      for(var i=0; i < result.rows.length; i++){
-        $scope.alldata.push(result.rows.item(i));
+  $ionicPlatform.ready(function(){
+    $cordovaSQLite.execute(db,"SELECT * FROM example").then(function(result){
+      if(result.rows.length){
+        for(var i=0; i < result.rows.length; i++){
+          $scope.alldata.push(result.rows.item(i));
+        }
+      }else{
+        console.log("No data found");
       }
-    }else{
-      console.log("No data found");
-    }
-  },function(error){
-    console.log("error"+err);
-  });
-
+    },function(error){
+      console.log("error"+err);
+    });
  });
+});
 
- $scope.load=function(){
-  
-  $cordovaSQLite.execute(db,"SELECT * FROM example").then(function(result){
-    if(result.rows.length){
-      for(var i=0; i < result.rows.length; i++){
-        $scope.alldata.push(result.rows.item(i));
-      }
-    }else{
-      console.log("No data found");
-    }
-  },function(error){
-    console.log("error"+err);
-  });
- }
+app.controller('DeleteCtrl', function($scope, $cordovaSQLite, $state, $ionicPopup){
 
- $scope.delete = function(item) {
+  $scope.delete = function(item) {
     var query = "DELETE FROM example where id = ?";
     $cordovaSQLite.execute(db, query, [item.id]).then(function(res) {
         $scope.items.splice($scope.items.indexOf(item), 1);
@@ -74,11 +70,7 @@ app.controller('infoCtrl',function($scope,$cordovaSQLite,$ionicPlatform,$ionicPo
     });
  }
 
- $scope.edit = function(item){
-  $state.go('app.editUnsolvedProblem');
- }
-
-$scope.showConfirm = function(item) {
+ $scope.showConfirm = function(item) {
    var confirmPopup = $ionicPopup.confirm({
      title: 'Delete Unsolved Problem',
      template: 'Are you sure you want to delete this unsolved problem?'
@@ -92,4 +84,56 @@ $scope.showConfirm = function(item) {
      }
    });
  };
-})
+});
+
+app.controller('EditCtrl', function($scope, $cordovaSQLite, $state){
+  $scope.item = {
+      firstname: "",
+      lastname: "",
+      id:$state.params.itemId
+    };
+
+
+  $scope.find = function(item) {
+    var query ="SELECT * FROM example where id = ?";
+    $cordovaSQLite.execute(db,query,[$scope.item.id]).then(function(result){
+    $scope.itemf = result.rows.item(0);
+    $scope.item.firstname = $scope.itemf.firstname;
+    $scope.item.lastname = $scope.itemf.lastname;
+    $scope.firstname = $scope.item.firstname;
+  });
+  };
+
+  $scope.save = function(item){
+      $scope.find(item);
+      var query ="UPDATE example SET firstname = ? ,lastname = ? where id = ?";
+      $cordovaSQLite.execute(db,query,[$scope.item.firstname,$scope.item.lastname,$scope.item.id]);
+      $state.go('unsolved');
+  };
+});
+
+
+app.config(function($stateProvider, $urlRouterProvider){
+
+    $stateProvider.state('unsolved', {
+      url: '/unsolved',
+      templateUrl: 'templates/unsolved.html',
+      controller: 'ShowCtrl'
+    });
+
+    $stateProvider.state('add', {
+      url: '/add',
+      templateUrl: 'templates/new_unsolved.html',
+      controller: 'AddCtrl'
+    });
+
+    $stateProvider.state('edit', {
+      url: '/edit/:itemId',
+      templateUrl: 'templates/edit_unsolved.html',
+      controller: 'EditCtrl'
+    });
+
+
+    $urlRouterProvider.otherwise('/unsolved');
+
+  });

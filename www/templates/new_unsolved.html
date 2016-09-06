@@ -1,3 +1,15 @@
-<ion-view ng-controller="infoCtrl" name="unsolved" view-title="Unsolved Problem">
-
+<ion-view name="unsolved" view-title="Unsolved Problem">
+<ion-content >
+      <div class="table1">
+        <form>
+          <label class="item item-input">
+            <input type="text" placeholder="firstname" ng-model="item.firstname">
+          </label>
+          <label class="item item-input">
+            <input type="text" placeholder="lastname" ng-model="item.lastname">
+          </label>
+          <button class="button button-block button-positive" ng-click="save()">Add</button>
+        </form>
+      </div>
+    </ion-content>
 </ion-view>
